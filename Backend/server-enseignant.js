@@ -29,7 +29,12 @@ app.get("/", function(request, response) {
     response.render("test.ejs");
 })
 
-app.get("/api/enseignants", function(request, response) {
+/**
+ * Avoir touts les enseignants dsponibles dans la base de données
+ * @function  
+ */
+
+function getEnsegnants(request, response) {
     Enseignant.find({}, function(error, enseignantsTrouves) {
         if (error) {
             console.log("Error in retrieving from the database");
@@ -37,10 +42,16 @@ app.get("/api/enseignants", function(request, response) {
             response.send(enseignantsTrouves);
         }
     })
-})
+}
 
+app.get("/api/enseignants", getEnsegnants)
 
-app.get("/api/enseignants/:enseignant", function(request, response) {
+/**
+ * Recuperer un enseignants a partir de son matricule
+ * @function 
+ */
+
+function getEnseignant(request, response) {
     Enseignant.find({matricule: request.params.enseignant}, function(error, enseignant) {
         if (error) {
             console.log(error);
@@ -48,10 +59,14 @@ app.get("/api/enseignants/:enseignant", function(request, response) {
             response.send(enseignant);
         }
     })
-})
+}
+app.get("/api/enseignants/:enseignant", getEnseignant)
 
-
-app.post("/api/enseignants/new", function(request, response) {
+/**
+ * Ajouter un nouveau enseignant
+ * @function
+ */
+function addEnseignant(request, response) {
     let nouveauEnseignant = new Enseignant({
         nom: request.body.nom,
         prenom: request.body.prenom,
@@ -64,11 +79,16 @@ app.post("/api/enseignants/new", function(request, response) {
             response.redirect("/api/enseignants")
         }
     })
-})
+}
+app.post("/api/enseignants/new", addEnseignant)
 
+/**
+ * Supprimer un enseignant
+ * @function
+ */
 
-app.delete("/api/enseignants/:enseignant/delete", function(request, response) {
-    Enseignant.findOneAndRemove({matricule: request.params.enseignant}, function(error) {
+function supprimerEnseignant(request, response) {
+    Enseignant.findOneAndRemove({matricule: request.body.matric}, function(error) {
         if (error) {
             console.log(error);
         } else {
@@ -76,7 +96,9 @@ app.delete("/api/enseignants/:enseignant/delete", function(request, response) {
             response.redirect("/api/enseignants");
         }
     })
-})
+}
+
+app.delete("/api/enseignants/:enseignant/delete", supprimerEnseignant)
 
 
 app.listen("4000", function() {

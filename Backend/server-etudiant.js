@@ -23,7 +23,12 @@ app.get("/", function(request, response) {
     response.render("test.ejs");
 })
 
-app.get("/api/etudiants", function(request, response) {
+/**
+ * Recuperer tous les etudiants
+ * @function
+ */
+
+function getEtudiants(request, response) {
     Etudiant.find({}, function(error, etudiantsTrouves) {
         if (error) {
             console.log("Error in retrieving from the database")
@@ -31,10 +36,16 @@ app.get("/api/etudiants", function(request, response) {
             response.send(etudiantsTrouves);
         }
     })
-})
+}
 
+app.get("/api/etudiants", getEtudiants)
 
-app.get("/api/etudiants/:etudiant", function(request, response) {
+/**
+ * Recuperer un etudiant de la base de données a partir de son matricule
+ * @function 
+ */
+
+function getEtudiant(request, response) {
     Etudiant.find({matricule: request.params.etudiant}, function(error, etudiant) {
         if (error) {
             console.log(error);
@@ -42,9 +53,15 @@ app.get("/api/etudiants/:etudiant", function(request, response) {
             response.send(etudiant);
         }
     })
-})
+}
+app.get("/api/etudiants/:etudiant", getEtudiant)
 
-app.post("/api/etudiants/new", function(request, response) {
+/**
+ * Ajouter un nouveau etudiant
+ * @function
+ */
+
+function addEtudiant(request, response) {
     let nouveauEtudiant = new Etudiant({
         nom: request.body.nom,
         prenom: request.body.prenom,
@@ -58,10 +75,17 @@ app.post("/api/etudiants/new", function(request, response) {
             response.redirect("/api/etudiants");
         }
     })
-})
+}
 
-app.delete("/api/etudiants/:etudiant/delete", function(request, response) {
-    Etudiant.findOneAndRemove({matricule: request.params.etudiant}, function(error) {
+app.post("/api/etudiants/new", addEtudiant)
+
+/**
+ * Supprimer un etudiant de la base de données
+ * @function
+ */
+
+function deleteEtudiant(request, response) {
+    Etudiant.findOneAndRemove({matricule: request.body.matric}, function(error) {
         if (error) {
             console.log(error);
         } else {
@@ -69,7 +93,9 @@ app.delete("/api/etudiants/:etudiant/delete", function(request, response) {
             response.redirect("/api/etudiants");
         }
     })
-})
+}
+
+app.delete("/api/etudiants/:etudiant/delete", deleteEtudiant)
 
 
 app.listen("4001", function() {
